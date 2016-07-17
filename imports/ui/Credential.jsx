@@ -8,6 +8,8 @@ export default class Credential extends Component {
     Credentials.update(this.props.credential._id, {
       $set: { checked: !this.props.credential.checked },
     });
+    // set var with selected credential id
+    //var selectedCredential = this.props.credential._id;
   }
 
   deleteThisCredential() {

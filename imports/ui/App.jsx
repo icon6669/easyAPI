@@ -45,6 +45,17 @@ class App extends Component {
   console.log("Add Credential Form submitted");
   }
 
+  handleRequestSegments(event) {
+    event.preventDefault();
+    var selectedCredentials = Credentials.find({checked: true});
+    var count=0;
+    selectedCredentials.forEach(function (credential){
+    console.log("going request segments from"+credential.logincompany);
+    count+=1;
+  });
+
+  }
+
   render() {
     return (
 <div>
@@ -80,6 +91,9 @@ class App extends Component {
         <ul>
           {this.renderCredentials()}
         </ul>
+        <button className="requestSegments" onClick={this.handleRequestSegments.bind(this)}>
+       Request Segments from Selected Credential
+       </button>
         </header>
       </div>
 
