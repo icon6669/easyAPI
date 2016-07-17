@@ -64,6 +64,21 @@ form {
   outline: 0;
 }
 
+
+.new-credential input {
+  box-sizing: border-box;
+  padding: 10px 0;
+  background: transparent;
+  border: none;
+  width: 100%;
+  padding-right: 80px;
+  font-size: 1em;
+}
+
+.new-credential input:focus{
+  outline: 0;
+}
+
 ul {
   margin: 0;
   padding: 0;
@@ -122,6 +137,9 @@ header .hide-completed {
   }
 
   .new-segment input {
+    padding-bottom: 5px;
+  }
+  .new-credential input {
     padding-bottom: 5px;
   }
 }
