@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-// Segment component - represents a single segment
+// Credential component - represents a single web services credential, record contains username, logincompany, and sharedsecret
 export default class Credential extends Component {
   render() {
     return (

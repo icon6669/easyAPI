@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom'
 import { createContainer } from 'meteor/react-meteor-data';
 
 import { Credentials } from '../api/credentials.js';
@@ -22,28 +23,76 @@ class App extends Component {
     ));
   }
 
+  handleCredentialSubmit(event) {
+    event.preventDefault();
+
+    // Find the credentials details via the React ref
+  const logincompany = ReactDOM.findDOMNode(this.refs.logincompanyInput).value.trim();
+  const username = ReactDOM.findDOMNode(this.refs.usernameInput).value.trim();
+  const sharedsecret = ReactDOM.findDOMNode(this.refs.sharedsecretInput).value.trim();
+
+  Credentials.insert({
+    logincompany,
+    username,
+    sharedsecret,
+    createdAt: new Date(), // current time
+  });
+
+  // Clear form
+  ReactDOM.findDOMNode(this.refs.logincompanyInput).value = '';
+  ReactDOM.findDOMNode(this.refs.usernameInput).value = '';
+  ReactDOM.findDOMNode(this.refs.sharedsecretInput).value = '';
+  console.log("Add Credential Form submitted");
+  }
+
   render() {
     return (
 <div>
       <div className="container">
-        <header>
-          <h1>Credentials List</h1>
-        </header>
+      <header>
+            <h2>Add new Credentials Below, then press enter</h2>
+          <form className="new-credential" onSubmit={this.handleCredentialSubmit.bind(this)} >
+             <input
+               type="text"
+               ref="logincompanyInput"
+               placeholder="Enter Web Services Login Company"
+             />
+             <input
+               type="text"
+               ref="usernameInput"
+               placeholder="Enter Web Services Username"
+             />
+             <input
+               type="text"
+               ref="sharedsecretInput"
+               placeholder="Enter Web Services Shared Secret"
+             />
+                   <button className="add" onClick={this.handleCredentialSubmit.bind(this)}>
+                  Add
+                  </button>
+         </form>
+    </header>
+    </div>
 
+    <div className="container">
+         <header>
+        <h1>Credential List</h1>
         <ul>
           {this.renderCredentials()}
         </ul>
+        </header>
       </div>
 
 
       <div className="container">
         <header>
           <h1>Segment List</h1>
-        </header>
+
 
         <ul>
           {this.renderSegments()}
         </ul>
+        </header>
       </div>
 </div>
     );
