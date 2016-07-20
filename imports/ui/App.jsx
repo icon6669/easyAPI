@@ -7,6 +7,8 @@ import Credential from './Credential.jsx';
 
 import { Segments } from '../api/segments.js';
 import Segment from './Segment.jsx';
+import '../api/adobeApi-client.js';
+import '../api/adobeApi-handlers.js';
 
 // App component - represents the whole app
 class App extends Component {
@@ -46,12 +48,47 @@ class App extends Component {
   }
 
   handleRequestSegments(event) {
-    event.preventDefault();
-    var selectedCredentials = Credentials.find({checked: true});
-    var count=0;
-    selectedCredentials.forEach(function (credential){
-    console.log("going request segments from"+credential.logincompany);
-    count+=1;
+      event.preventDefault();
+      var selectedCredentials = Credentials.find({checked: true});
+      var count=0;
+
+      selectedCredentials.forEach(function (credential){
+        //API CODE GOES HERE
+      console.log("requesting segments from "+credential.logincompany);
+      //  console.log("public settings are: "+Meteor.settings);
+
+
+        // Get all available metrics using the Client object
+       var omUsername='kjemison:BBVA';
+      var omSharedSecret='b6153ed23eba53daa342dea0e0ca6c27';
+      var omEndpoint='api.omniture.com';
+      options={version: '1.4'};
+
+
+      
+      function getSegmentsList() {
+    requestJSON='';
+    		getAnalyticsClient().makeRequest("Segments.Get", requestJSON, handleResults).fail(function (reportData) {
+    			if (typeof data.responseJSON.error_description !== "undefined") {
+    				console.log("api responseJSON.error is: "+data.responseJSON.error_description);
+    			}
+    		}).done(function() {
+            console.log("api response passed to handleResults function");
+    		});
+    	}
+
+    	function handleResults(data) {
+    		console.log("data passed to handleResults is: "+data);
+    	}
+
+    	function getAnalyticsClient() {
+    		return MarketingCloud.getAnalyticsClient(omUsername, omSharedSecret, omEndpoint);
+    	}
+
+
+      getSegmentsList();
+
+          count+=1;
   });
 
   }

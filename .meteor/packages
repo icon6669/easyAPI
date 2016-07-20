@@ -22,3 +22,6 @@ insecure                # Allow all DB writes from clients (for prototyping)
 accounts-base
 accounts-ui
 react-meteor-data
+http
+service-configuration
+accounts-google

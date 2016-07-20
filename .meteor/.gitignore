@@ -1,2 +1,4 @@
 local
 dev_bundle
+settings_development.json
+settings_production.json
