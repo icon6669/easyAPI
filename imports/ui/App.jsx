@@ -8,7 +8,7 @@ import Credential from './Credential.jsx';
 import { Segments } from '../api/segments.js';
 import Segment from './Segment.jsx';
 import '../api/adobeApi-client.js';
-import '../api/adobeApi-handlers.js';
+
 
 // App component - represents the whole app
 class App extends Component {
@@ -50,7 +50,7 @@ class App extends Component {
   handleRequestSegments(event) {
       event.preventDefault();
       var selectedCredentials = Credentials.find({checked: true});
-      var count=0;
+      var credentialCount=segmentCount=0;
 
       selectedCredentials.forEach(function (credential){
         //API CODE GOES HERE
@@ -59,16 +59,15 @@ class App extends Component {
 
 
         // Get all available metrics using the Client object
-       var omUsername='kjemison:BBVA';
-      var omSharedSecret='b6153ed23eba53daa342dea0e0ca6c27';
+     var omUsername=credential.username;
+      var omSharedSecret=credential.sharedsecret;
       var omEndpoint='api.omniture.com';
-      options={version: '1.4'};
 
 
-      
+
       function getSegmentsList() {
-    requestJSON='';
-    		getAnalyticsClient().makeRequest("Segments.Get", requestJSON, handleResults).fail(function (reportData) {
+    requestJSON='{"fields":["tags","definition","description"]}';
+    		getAnalyticsClient().makeRequest("Segments.Get", requestJSON, handleSegmentList).fail(function (reportData) {
     			if (typeof data.responseJSON.error_description !== "undefined") {
     				console.log("api responseJSON.error is: "+data.responseJSON.error_description);
     			}
@@ -77,18 +76,50 @@ class App extends Component {
     		});
     	}
 
-    	function handleResults(data) {
-    		console.log("data passed to handleResults is: "+data);
-    	}
+    	function handleSegmentList(data) {
+        console.log("count of data passed to handleSegmentList is: "+data.length);
+          data.forEach(function (segment){
+            const id = segment.id;
+            const name = segment.name;
+            const tags = segment.tags;
+            const definition = segment.definition;
+            const description = segment.description;
+
+      /*      Segments.upsert({
+              //Selector
+              id:segment.id
+              },{
+                $set:{
+                //Modifier
+                id,
+                name,
+                tags,
+                description,
+                time: Date.now() // current time
+                }
+              }); */
+
+            Segments.insert({
+              id,
+              name,
+              tags,
+              definition,
+              description,
+              createdAt: new Date(), // current time
+            });
+
+          segmentCount+=1;
+          });
+      }
 
     	function getAnalyticsClient() {
-    		return MarketingCloud.getAnalyticsClient(omUsername, omSharedSecret, omEndpoint);
+        return MarketingCloud.getAnalyticsClient(omUsername, omSharedSecret, omEndpoint);
     	}
 
 
       getSegmentsList();
 
-          count+=1;
+          credentialCount+=1;
   });
 
   }
