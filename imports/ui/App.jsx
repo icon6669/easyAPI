@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom'
 import { createContainer } from 'meteor/react-meteor-data';
+import AccountsUIWrapper from './AccountsUIWrapper.jsx';
 
 import { Credentials } from '../api/credentials.js';
 import Credential from './Credential.jsx';
@@ -30,15 +31,10 @@ class App extends Component {
 
     // Find the credentials details via the React ref
   const logincompany = ReactDOM.findDOMNode(this.refs.logincompanyInput).value.trim();
-  const username = ReactDOM.findDOMNode(this.refs.usernameInput).value.trim();
-  const sharedsecret = ReactDOM.findDOMNode(this.refs.sharedsecretInput).value.trim();
+  const wsusername = ReactDOM.findDOMNode(this.refs.usernameInput).value.trim();
+  const wssharedsecret = ReactDOM.findDOMNode(this.refs.sharedsecretInput).value.trim();
 
-  Credentials.insert({
-    logincompany,
-    username,
-    sharedsecret,
-    createdAt: new Date(), // current time
-  });
+  Meteor.call('credentials.insert', logincompany, wsusername, wssharedsecret);
 
   // Clear form
   ReactDOM.findDOMNode(this.refs.logincompanyInput).value = '';
@@ -47,27 +43,29 @@ class App extends Component {
   console.log("Add Credential Form submitted");
   }
 
+
+    selectAllSegments(event) {
+      Segments.update({},{
+        $set: {checked: 'checked'}
+      });
+    }
+
   handleRequestSegments(event) {
       event.preventDefault();
       var selectedCredentials = Credentials.find({checked: true});
-      var credentialCount=segmentCount=0;
+    //  var credentialCount=segmentCount=0;
 
       selectedCredentials.forEach(function (credential){
-        //API CODE GOES HERE
       console.log("requesting segments from "+credential.logincompany);
-      //  console.log("public settings are: "+Meteor.settings);
 
-
-        // Get all available metrics using the Client object
-     var omUsername=credential.username;
-      var omSharedSecret=credential.sharedsecret;
+     var omUsername=credential.wsusername;
+      var omSharedSecret=credential.wssharedsecret;
       var omEndpoint='api.omniture.com';
-
 
 
       function getSegmentsList() {
     requestJSON='{"fields":["tags","definition","description"]}';
-    		getAnalyticsClient().makeRequest("Segments.Get", requestJSON, handleSegmentList).fail(function (reportData) {
+    		getAnalyticsClient().makeRequest("Segments.Get", requestJSON, handleSegmentList).fail(function (data) {
     			if (typeof data.responseJSON.error_description !== "undefined") {
     				console.log("api responseJSON.error is: "+data.responseJSON.error_description);
     			}
@@ -108,7 +106,7 @@ class App extends Component {
               createdAt: new Date(), // current time
             });
 
-          segmentCount+=1;
+        //  segmentCount+=1;
           });
       }
 
@@ -116,10 +114,8 @@ class App extends Component {
         return MarketingCloud.getAnalyticsClient(omUsername, omSharedSecret, omEndpoint);
     	}
 
-
       getSegmentsList();
-
-          credentialCount+=1;
+      //credentialCount+=1;
   });
 
   }
@@ -128,6 +124,8 @@ class App extends Component {
     return (
 <div>
       <div className="container">
+
+      <AccountsUIWrapper />
       <header>
             <h2>Add new Credentials Below, then press enter</h2>
           <form className="new-credential" onSubmit={this.handleCredentialSubmit.bind(this)} >
@@ -169,7 +167,9 @@ class App extends Component {
       <div className="container">
         <header>
           <h1>Segment List</h1>
-
+          <button className="selectAllSegments" onClick={this.selectAllSegments.bind(this)}>
+         Select All Segments
+         </button>
 
         <ul>
           {this.renderSegments()}

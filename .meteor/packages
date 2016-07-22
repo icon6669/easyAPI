@@ -25,3 +25,4 @@ react-meteor-data
 http
 service-configuration
 accounts-google
+accounts-password

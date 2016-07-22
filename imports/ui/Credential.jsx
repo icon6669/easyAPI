@@ -1,19 +1,20 @@
 import React, { Component, PropTypes } from 'react';
 import {Credentials} from '../api/credentials.js';
+import {Meteor} from 'meteor/meteor';
 
 // Credential component - represents a single web services credential, record contains username, logincompany, and sharedsecret
 export default class Credential extends Component {
   toggleChecked() {
     // Set the checked property to the opposite of its current value
-    Credentials.update(this.props.credential._id, {
-      $set: { checked: !this.props.credential.checked },
-    });
+
+    Meteor.call('credentials.setChecked',this.props.credential._id, !this.props.credential.checked);
+
     // set var with selected credential id
     //var selectedCredential = this.props.credential._id;
   }
 
   deleteThisCredential() {
-    Credentials.remove(this.props.credential._id);
+    Meteor.call('credentials.remove', this.props.credential._id);
   }
 
   render() {
@@ -35,7 +36,7 @@ const credentialClassName = this.props.credential.checked ? 'checked' : '';
         onClick={this.toggleChecked.bind(this)}
       />
 
-      <span className="credentialLabel">{this.props.credential.logincompany} - {this.props.credential.username}</span>
+      <span className="credentialLabel">{this.props.credential.logincompany} - {this.props.credential.wsusername}</span>
       </li>
     );
   }

@@ -1,6 +1,6 @@
 (function ($) {
     window.MarketingCloud = window.MarketingCloud || {};
-	window.MarketingCloud.getAnalyticsClient = function(username, secret, endpoint) {
+	window.MarketingCloud.getAnalyticsClient = function(wsusername, wssecret, endpoint) {
         return {
             makeRequest: function(method, data, successCallback) {
                 var url = 'https://' + endpoint + '/admin/1.4/rest/?method=' + method;
@@ -10,7 +10,7 @@
                     success : successCallback,
                     dataType : 'json',
                     headers : {
-                        'X-WSSE' : wsseHeader(username, secret)
+                        'X-WSSE' : wsseHeader(wsusername, wssecret)
                     }
                 });
             }
