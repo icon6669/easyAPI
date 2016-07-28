@@ -45,6 +45,7 @@ Meteor.methods({
             id,
             name,
             tags,
+            reportSuiteID,
             definition,
             description,
             time: Date.now() // current time

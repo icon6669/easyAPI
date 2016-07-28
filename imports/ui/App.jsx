@@ -63,7 +63,7 @@ class App extends Component {
 
         function getSegmentsList() {
             //refactor to make json request fields selectable from checkbox list
-        requestJSON='{"fields":["tags","definition","description"]}';
+        requestJSON='{"fields":["tags","definition","description","reportSuiteID"]}';
         		getAnalyticsClient().makeRequest("Segments.Get", requestJSON, handleSegmentList).fail(function (data) {
         			if (typeof data.responseJSON.error_description !== "undefined") {
         				console.log("api responseJSON.error is: "+data.responseJSON.error_description);
@@ -76,16 +76,12 @@ class App extends Component {
       	function handleSegmentList(data) {
           console.log("count of data passed to handleSegmentList is: "+data.length);
             data.forEach(function (segment){
-              const id = segment.id;
-              const name = segment.name;
-              const tags = segment.tags;
-              const definition = segment.definition;
-              const description = segment.description;
 
             Meteor.call('segments.upsert',
                           segment.id,
                           segment.name,
                           segment.tags,
+                          segment.reportSuiteID,
                           segment.definition,
                           segment.description
                         );
@@ -100,27 +96,62 @@ class App extends Component {
     	}
 
       getSegmentsList();
-      //Meteor.call('credentials.setChecked',selectedCredentials,false);
+      //selectedCredentials.forEach(Meteor.call('credentials.setChecked',selectedCredentials._id,false);
       //credentialCount+=1;
     });
     }
 
+    handleSetDestinationRSID(event){
 
-
-/*
-  handleSaveSegments(event) {
-    event.preventDefault();
-    var selectedCredentials = Credentials.find({checked: true});
-  //  var credentialCount=segmentCount=0;
-
-    selectedCredentials.forEach(function (credential){
-    console.log("saving segments to "+credential.logincompany);
-
-    var omUsername=credential.wsusername;
-    var omSharedSecret=credential.wssharedsecret;
-    var omEndpoint='api.omniture.com';
     }
-  } */
+
+
+  handleSaveSegments(event) {
+      event.preventDefault();
+      var destinationReportSuiteID = ReactDOM.findDOMNode(this.refs.destinationReportSuiteIDInput).value.trim();
+      var selectedCredentials = Credentials.find({checked: true});
+      //  var credentialCount=segmentCount=0;
+
+      selectedCredentials.forEach(function (credential){
+        console.log("saving segments to "+credential.logincompany);
+
+        var omUsername=credential.wsusername;
+        var omSharedSecret=credential.wssharedsecret;
+        var omEndpoint='api.omniture.com';
+
+        function saveSegments() {
+            //refactor to make json request fields selectable from checkbox list
+
+        selectedSegments=Segments.find({checked: true})
+            selectedSegments.forEach(function (segment){
+                requestJSON='{"definition":'+JSON.stringify(segment.definition)+',"reportSuiteID":"'+destinationReportSuiteID+'","description":"'+segment.description+'","name":"'+segment.name+'"}';
+              //comment out line below after dev
+                console.log("temp requestJson is: "+requestJSON);
+                    getAnalyticsClient().makeRequest("Segments.Save", requestJSON, handleSaveResponse).fail(function (data) {
+                      if (typeof data.responseJSON.error_description !== "undefined") {
+                        console.log("api responseJSON.error is: "+data.responseJSON.error_description);
+                      }
+                    }).done(function() {
+                        console.log("segment save request complete");
+                    });
+
+            });
+        }
+
+
+      function handleSaveResponse(data) {
+        console.log("segment save response json including id is: "+data);
+      }
+
+      function getAnalyticsClient() {
+        return MarketingCloud.getAnalyticsClient(omUsername, omSharedSecret, omEndpoint);
+      }
+
+    saveSegments();
+
+    });
+
+  }
 
   render() {
     return (
@@ -176,6 +207,18 @@ class App extends Component {
             <ul>
               {this.renderSegments()}
             </ul>
+
+            <form className="destinationReportSuite" onSubmit={this.handleSetDestinationRSID.bind(this)} >
+               <input
+                 type="text"
+                 ref="destinationReportSuiteIDInput"
+                 placeholder="Enter Destination Report Suite ID"
+               />
+           </form>
+
+            <button className="saveSelectedSegments" onClick={this.handleSaveSegments.bind(this)}>
+           Save Selected Segments
+           </button>
             </header>
           </div>
     </div>
