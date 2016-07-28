@@ -63,7 +63,7 @@ class App extends Component {
 
         function getSegmentsList() {
             //refactor to make json request fields selectable from checkbox list
-        requestJSON='{"fields":["tags","definition","description","reportSuiteID"]}';
+        requestJSON='{"accessLevel":"all","fields":["tags","definition","description","reportSuiteID"]}';
         		getAnalyticsClient().makeRequest("Segments.Get", requestJSON, handleSegmentList).fail(function (data) {
         			if (typeof data.responseJSON.error_description !== "undefined") {
         				console.log("api responseJSON.error is: "+data.responseJSON.error_description);
@@ -126,7 +126,7 @@ class App extends Component {
             selectedSegments.forEach(function (segment){
                 requestJSON='{"definition":'+JSON.stringify(segment.definition)+',"reportSuiteID":"'+destinationReportSuiteID+'","description":"'+segment.description+'","name":"'+segment.name+'"}';
               //comment out line below after dev
-                console.log("temp requestJson is: "+requestJSON);
+              //console.log("temp requestJson is: "+requestJSON);
                     getAnalyticsClient().makeRequest("Segments.Save", requestJSON, handleSaveResponse).fail(function (data) {
                       if (typeof data.responseJSON.error_description !== "undefined") {
                         console.log("api responseJSON.error is: "+data.responseJSON.error_description);
@@ -140,7 +140,7 @@ class App extends Component {
 
 
       function handleSaveResponse(data) {
-        console.log("segment save response json including id is: "+data);
+        console.log("segment save response json including id is: "+JSON.stringify(data));
       }
 
       function getAnalyticsClient() {
@@ -203,11 +203,10 @@ class App extends Component {
               <button className="selectAllSegments" onClick={this.selectAllSegments.bind(this)}>
              Select All Segments
              </button>
-
-            <ul>
-              {this.renderSegments()}
-            </ul>
-
+             <button className="saveSelectedSegments" onClick={this.handleSaveSegments.bind(this)}>
+            Save Selected Segments
+            </button>
+            
             <form className="destinationReportSuite" onSubmit={this.handleSetDestinationRSID.bind(this)} >
                <input
                  type="text"
@@ -215,6 +214,12 @@ class App extends Component {
                  placeholder="Enter Destination Report Suite ID"
                />
            </form>
+
+            <ul>
+              {this.renderSegments()}
+            </ul>
+
+
 
             <button className="saveSelectedSegments" onClick={this.handleSaveSegments.bind(this)}>
            Save Selected Segments

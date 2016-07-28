@@ -32,7 +32,6 @@ const segmentClassName = this.props.segment.checked ? 'checked' : '';
       />
 
       <span className="segmentLabel">{this.props.segment.name}  </span>
-      <span className="segmentLabel">  Tags are: {this.props.segment.tags}</span>
 
       </li>
     );
