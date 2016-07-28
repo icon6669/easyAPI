@@ -5,13 +5,11 @@ import {Segments} from '../api/segments.js';
 export default class Segment extends Component {
   toggleChecked() {
     // Set the checked property to the opposite of its current value
-    Segments.update(this.props.segment._id, {
-      $set: { checked: !this.props.segment.checked },
-    });
+    Meteor.call('segments.setChecked',this.props.segment._id,!this.props.segment.checked);
   }
 
   deleteThisSegment() {
-    Segments.remove(this.props.segment._id);
+    Meteor.call('segments.remove', this.props.segment._id);
   }
 
   render() {
